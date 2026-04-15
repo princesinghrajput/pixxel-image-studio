@@ -1,12 +1,9 @@
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/header";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { FloatingShapes } from "@/components/floating-shapes";
 import { Toaster } from "sonner";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "Pixxel",
@@ -19,7 +16,7 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="icon" href="/logo-text.png" sizes="any" />
       </head>
-      <body className={`${inter.className}`}>
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

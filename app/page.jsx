@@ -6,7 +6,6 @@ import PricingSection from "@/components/pricing";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Fraunces, Space_Grotesk } from "next/font/google";
 import {
   ArrowRight,
   CheckCircle2,
@@ -16,12 +15,6 @@ import {
   Wand2,
 } from "lucide-react";
 import { setEntryMode } from "@/hooks/use-entry-mode";
-
-const fraunces = Fraunces({ subsets: ["latin"], weight: ["600", "700"] });
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
 
 const proofPoints = [
   "AI background cleanup",
@@ -59,13 +52,13 @@ function HeroPanel({ onWorkspaceEnter }) {
           </div>
 
           <h1
-            className={`${fraunces.className} text-4xl leading-[1.02] text-white sm:text-5xl lg:text-6xl`}
+            className="text-4xl leading-[1.02] text-white sm:text-5xl lg:text-6xl font-semibold tracking-tight"
           >
             Create polished visuals in a workspace built for speed.
           </h1>
 
           <p
-            className={`${spaceGrotesk.className} mt-6 max-w-2xl text-base leading-8 text-white/72 md:text-lg`}
+            className="mt-6 max-w-2xl text-base leading-8 text-white/72 md:text-lg"
           >
             Crop, resize, retouch, and enhance images in a clean editor that
             feels premium from the first click.
@@ -229,7 +222,7 @@ export default function Page() {
   };
 
   return (
-    <div className={`${spaceGrotesk.className} relative overflow-hidden pb-24`}>
+    <div className="relative overflow-hidden pb-24">
       <div className="absolute inset-0 -z-10 bg-[#07131d]" />
       <HeroPanel onWorkspaceEnter={handleWorkspaceEnter} />
       <ValueStrip />
@@ -243,7 +236,7 @@ export default function Page() {
             Built to move fast
           </p>
           <h2
-            className={`${fraunces.className} mt-4 text-4xl text-white md:text-5xl`}
+            className="mt-4 text-4xl text-white md:text-5xl font-semibold tracking-tight"
           >
             Start creating with a cleaner front door.
           </h2>
