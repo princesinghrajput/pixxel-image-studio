@@ -2,6 +2,8 @@ import { useCanvas } from "@/context/context";
 import { api } from "@/convex/_generated/api";
 import { useConvexMutation } from "@/hooks/use-convex-query";
 import { Canvas, FabricImage } from "fabric";
+import { Button } from "@/components/ui/button";
+import { Maximize2, Minus, Plus } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 function CanvasEditor({ project }) {
@@ -10,6 +12,7 @@ function CanvasEditor({ project }) {
   const { canvasEditor, setCanvasEditor, activeTool, onToolChange } =
     useCanvas();
   const [isLoading, setIsLoading] = useState(true);
+  const [viewportZoom, setViewportZoom] = useState(1);
 
   const { mutate: updateProject } = useConvexMutation(
     api.projects.updateProject
@@ -32,6 +35,7 @@ function CanvasEditor({ project }) {
       setIsLoading(true);
 
       const viewportScale = calculateViewportScale();
+      setViewportZoom(viewportScale);
       const canvas = new Canvas(canvasRef.current, {
         width: project.width,
         height: project.height,
@@ -192,6 +196,7 @@ function CanvasEditor({ project }) {
       if (!canvasEditor || !project) return;
 
       const newScale = calculateViewportScale();
+      setViewportZoom(newScale);
       canvasEditor.setDimensions(
         {
           width: project.width * newScale,
@@ -207,6 +212,26 @@ function CanvasEditor({ project }) {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [canvasEditor, project]);
+
+  const applyViewportZoom = (zoom) => {
+    if (!canvasEditor || !project) return;
+    const nextZoom = Math.max(0.1, Math.min(2, zoom));
+    setViewportZoom(nextZoom);
+    canvasEditor.setDimensions(
+      {
+        width: project.width * nextZoom,
+        height: project.height * nextZoom,
+      },
+      { backstoreOnly: false }
+    );
+    canvasEditor.setZoom(nextZoom);
+    canvasEditor.calcOffset();
+    canvasEditor.requestRenderAll();
+  };
+
+  const fitCanvasToViewport = () => {
+    applyViewportZoom(calculateViewportScale());
+  };
 
   // Handle automatic tab switching when text is selected
   useEffect(() => {
@@ -254,6 +279,45 @@ function CanvasEditor({ project }) {
           </div>
         </div>
       )}
+
+      <div className="absolute left-4 top-4 z-10 flex items-center gap-2 rounded-md border border-white/10 bg-slate-950/70 px-3 py-2 text-xs text-white/75 shadow-lg backdrop-blur">
+        <span className="font-medium text-white">{project.width} × {project.height}</span>
+        <span className="h-1 w-1 rounded-full bg-white/30" />
+        <span>{Math.round(viewportZoom * 100)}%</span>
+      </div>
+
+      <div className="absolute bottom-4 right-4 z-10 flex items-center gap-1 rounded-md border border-white/10 bg-slate-950/75 p-1 shadow-lg backdrop-blur">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => applyViewportZoom(viewportZoom - 0.1)}
+          className="h-8 w-8 text-white hover:bg-white/10"
+          title="Zoom out"
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={fitCanvasToViewport}
+          className="h-8 w-8 text-white hover:bg-white/10"
+          title="Fit to screen"
+        >
+          <Maximize2 className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={() => applyViewportZoom(viewportZoom + 0.1)}
+          className="h-8 w-8 text-white hover:bg-white/10"
+          title="Zoom in"
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
 
       <div className="px-5">
         <canvas id="canvas" className="border" ref={canvasRef} />

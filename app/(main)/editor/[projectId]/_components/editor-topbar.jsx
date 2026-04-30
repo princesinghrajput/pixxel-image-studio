@@ -19,6 +19,7 @@ import {
   Download,
   FileImage,
   Lock,
+  Layers3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,6 +60,11 @@ const TOOLS = [
     id: "text",
     label: "Text",
     icon: Text,
+  },
+  {
+    id: "layers",
+    label: "Layers",
+    icon: Layers3,
   },
   {
     id: "background",
@@ -247,6 +253,94 @@ export function EditorTopBar({ project }) {
       setTimeout(() => setIsUndoRedoOperation(false), 100);
     }
   };
+
+  useEffect(() => {
+    if (!canvasEditor) return;
+
+    const isTypingTarget = (target) => {
+      const tagName = target?.tagName?.toLowerCase();
+      return ["input", "textarea", "select"].includes(tagName) || target?.isContentEditable;
+    };
+
+    const handleKeyDown = async (event) => {
+      if (isTypingTarget(event.target)) return;
+
+      const activeObject = canvasEditor.getActiveObject();
+      if (activeObject?.isEditing) return;
+
+      const isModifier = event.metaKey || event.ctrlKey;
+
+      if (isModifier && event.key.toLowerCase() === "z" && !event.shiftKey) {
+        event.preventDefault();
+        handleUndo();
+        return;
+      }
+
+      if (
+        (isModifier && event.shiftKey && event.key.toLowerCase() === "z") ||
+        (isModifier && event.key.toLowerCase() === "y")
+      ) {
+        event.preventDefault();
+        handleRedo();
+        return;
+      }
+
+      if (isModifier && event.key.toLowerCase() === "s") {
+        event.preventDefault();
+        handleManualSave();
+        return;
+      }
+
+      if (isModifier && event.key.toLowerCase() === "d" && activeObject) {
+        event.preventDefault();
+        try {
+          const clone = await activeObject.clone();
+          clone.set({
+            left: (activeObject.left || 0) + 24,
+            top: (activeObject.top || 0) + 24,
+            evented: true,
+            selectable: true,
+          });
+          canvasEditor.add(clone);
+          canvasEditor.setActiveObject(clone);
+          canvasEditor.requestRenderAll();
+        } catch (error) {
+          console.error("Error duplicating object:", error);
+          toast.error("Failed to duplicate object");
+        }
+        return;
+      }
+
+      if (["Backspace", "Delete"].includes(event.key) && activeObject) {
+        event.preventDefault();
+        canvasEditor.remove(activeObject);
+        canvasEditor.discardActiveObject();
+        canvasEditor.requestRenderAll();
+        return;
+      }
+
+      if (
+        activeObject &&
+        ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(event.key)
+      ) {
+        event.preventDefault();
+        const distance = event.shiftKey ? 10 : 1;
+        const delta = {
+          ArrowUp: { top: (activeObject.top || 0) - distance },
+          ArrowDown: { top: (activeObject.top || 0) + distance },
+          ArrowLeft: { left: (activeObject.left || 0) - distance },
+          ArrowRight: { left: (activeObject.left || 0) + distance },
+        }[event.key];
+        activeObject.set(delta);
+        activeObject.setCoords();
+        canvasEditor.fire("object:modified", { target: activeObject });
+        canvasEditor.requestRenderAll();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [canvasEditor, undoStack, redoStack, isUndoRedoOperation, isSaving]);
 
   const handleBackToDashboard = () => {
     router.push("/dashboard");

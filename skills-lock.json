@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "planner": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/planner/SKILL.md",
+      "computedHash": "ab1d97975dcf20cebe27960f1b0abd7e2db16fa31261aebe29342eca33076f91"
+    }
+  }
+}

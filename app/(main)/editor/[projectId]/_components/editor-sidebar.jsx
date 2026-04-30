@@ -9,6 +9,7 @@ import {
   Maximize2,
   Text,
   Eye,
+  Layers3,
 } from "lucide-react";
 import { AdjustControls } from "./_tools/adjust";
 import { BackgroundControls } from "./_tools/background-controls";
@@ -18,6 +19,7 @@ import { AIExtenderControls } from "./_tools/ai-extend";
 import { ResizeControls } from "./_tools/resize";
 import { AIEdit } from "./_tools/ai-edit";
 import { CropContent } from "./_tools/crop";
+import { LayersControls } from "./_tools/layers";
 
 const TOOL_CONFIGS = {
   resize: {
@@ -49,6 +51,11 @@ const TOOL_CONFIGS = {
     title: "Add Text",
     icon: Text,
     description: "Customize in Various Fonts",
+  },
+  layers: {
+    title: "Layers",
+    icon: Layers3,
+    description: "Arrange objects, align, duplicate, and fine tune transforms",
   },
   ai_edit: {
     title: "AI Editing",
@@ -103,6 +110,8 @@ function renderToolContent(activeTool, project) {
       return <AIExtenderControls project={project} />;
     case "text":
       return <TextControls />;
+    case "layers":
+      return <LayersControls />;
     case "ai_edit":
       return <AIEdit project={project} />;
     default:

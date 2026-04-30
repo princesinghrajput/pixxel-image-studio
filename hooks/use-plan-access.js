@@ -11,6 +11,7 @@ export function usePlanAccess() {
     crop: true,
     adjust: true,
     text: true,
+    layers: true,
 
     // Pro-only tools
     background: isPro,
